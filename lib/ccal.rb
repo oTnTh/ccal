@@ -1,6 +1,6 @@
-# encoding: GBK
+# encoding: utf-8
 #
-# ccal.rb - ¹«ÀúÅ©Àú»¥×ª¿â
+# ccal.rb - å…¬å†å†œå†äº’è½¬åº“
 #
 # Copyright (c) 2009, by Br (http://otnth.blogspot.com)
 # All rights reserved.
@@ -26,11 +26,11 @@ module CCal
   LunarFirstYear = 1900
   LunarLastYear  = 2100
   
-  # Å©ÀúÊı¾İ
-  #  0 -   4 ¹²5bit  ´º½ÚÈÕ·İ
-  #  5 -   6 ¹²2bit  ´º½ÚÔÂ·İ
-  #  7 -  19 ¹²13bit 13¸öÔÂµÄ´óĞ¡ÔÂÇé¿ö£¬1Îª´óÔÂ30Ìì£¬0ÎªĞ¡ÔÂ29Ìì£¬ÎŞÈòÔÂ×îºóÎ»Îª0
-  #  20 - 23 ¹²4bit  ÈòÔÂÔÂ·İ£¬ÈçÎŞÈòÔÂÎª0
+  # å†œå†æ•°æ®
+  #  0 -   4 å…±5bit  æ˜¥èŠ‚æ—¥ä»½
+  #  5 -   6 å…±2bit  æ˜¥èŠ‚æœˆä»½
+  #  7 -  19 å…±13bit 13ä¸ªæœˆçš„å¤§å°æœˆæƒ…å†µï¼Œ1ä¸ºå¤§æœˆ30å¤©ï¼Œ0ä¸ºå°æœˆ29å¤©ï¼Œæ— é—°æœˆæœ€åä½ä¸º0
+  #  20 - 23 å…±4bit  é—°æœˆæœˆä»½ï¼Œå¦‚æ— é—°æœˆä¸º0
   #  [m].pack('B*').unpack('H*')[0]
   LunarCalendarTable = [
     0x0A5B3F, # 1900
@@ -56,9 +56,9 @@ module CCal
     0x0D5252,0x0DAA47,0x66B53B,0x056D4F,0x04AE45,0x4A4EB9,0x0A4D4C,0x0D1541,0x2D92B5,0x0EA93F  # 2091-2100
   ]
   
-  # ½ÚÆøÊı¾İ
-  # ´Ó¹«Àú1900Äê¿ªÊ¼£¬Ã¿24¸öÊı¾İÎªÒ»Äê
-  # µÚÒ»¸öÊı¾İÎªµ±ÄêĞ¡º®Óë1900ÄêÔªµ©Ïà²îµÄÌìÊı
+  # èŠ‚æ°”æ•°æ®
+  # ä»å…¬å†1900å¹´å¼€å§‹ï¼Œæ¯24ä¸ªæ•°æ®ä¸ºä¸€å¹´
+  # ç¬¬ä¸€ä¸ªæ•°æ®ä¸ºå½“å¹´å°å¯’ä¸1900å¹´å…ƒæ—¦ç›¸å·®çš„å¤©æ•°
   SolarTermTable = [
     5, 19, 34, 49, 64, 79, 94, 109,
     125, 140, 156, 172, 187, 203, 219, 234,
@@ -665,35 +665,35 @@ module CCal
     73298, 73314, 73329, 73344, 73359, 73374, 73389, 73404
   ]
   
-  # ·µ»Ø´º½ÚÀëÔªµ©µÄÌìÊı
+  # è¿”å›æ˜¥èŠ‚ç¦»å…ƒæ—¦çš„å¤©æ•°
   def iGetLNewYearOffsetDays(iYear)
     days = (LunarCalendarTable[iYear-LunarFirstYear] & 0x001F) - 1
-    # ´º½Ú²»ÔÚ1ÔÂ¾Í¼ÓÉÏ1ÔÂµÄ31Ìì
+    # æ˜¥èŠ‚ä¸åœ¨1æœˆå°±åŠ ä¸Š1æœˆçš„31å¤©
     days += 31 if (((LunarCalendarTable[iYear-LunarFirstYear] & 0x0060) >> 5) != 1)
     return days
   end
   
-  # Ä³¹«ÀúÄêÊÇ·ñÎªÈòÄê
+  # æŸå…¬å†å¹´æ˜¯å¦ä¸ºé—°å¹´
   def bIsSolarLeapYear(iYear)
     return ((iYear % 4 == 0) && (iYear % 100 != 0) || iYear % 400 == 0)
   end
   
-  # ·µ»Ø¹«ÀúÄ³ÈÕÀëÔªµ©µÄÌìÊı
+  # è¿”å›å…¬å†æŸæ—¥ç¦»å…ƒæ—¦çš„å¤©æ•°
   def iGetSNewYearOffsetDays(iYear, iMonth, iDay)
     return (Date.civil(iYear, iMonth, iDay) - Date.civil(iYear, 1, 1)).to_i
   end
   
-  # ·µ»ØÅ©ÀúÄ³ÔÂµÄÌìÊı
+  # è¿”å›å†œå†æŸæœˆçš„å¤©æ•°
   def iGetLMonthDays(iYear, iMonth)
     return ((LunarCalendarTable[iYear-LunarFirstYear] & (0x80000>>(iMonth-1))) == 0) ? 29 : 30
   end
   
-  # ·µ»ØÅ©ÀúÄ³ÔÂÈò¼¸ÔÂ£¬ÎŞÈòÔÂ·µ»Ø0
+  # è¿”å›å†œå†æŸæœˆé—°å‡ æœˆï¼Œæ— é—°æœˆè¿”å›0
   def iGetLLeapMonth(iYear)
     return (LunarCalendarTable[iYear - LunarFirstYear] & 0xF00000) >> 20
   end
   
-  # ·µ»Ø¹«ÀúÄ³Ìì½ÚÆøĞòÊı£¬´ÓĞ¡º®¿ªÊ¼Ëã£¬ÎŞ½ÚÔò·µ»Ø0
+  # è¿”å›å…¬å†æŸå¤©èŠ‚æ°”åºæ•°ï¼Œä»å°å¯’å¼€å§‹ç®—ï¼Œæ— èŠ‚åˆ™è¿”å›0
   def iGetSolarTerm(iYear, iMonth, iDay)
     ybase = 1900
     offset = Date.new(iYear, iMonth, iDay) - Date.new(ybase, 1, 1)
@@ -710,18 +710,18 @@ module CCal
     return 0
   end
   
-  # ¹«Àú×ªÅ©Àú
+  # å…¬å†è½¬å†œå†
   def aSolarToLunar(iYear, iMonth, iDay)
-    # ¼ì²é·¶Î§
+    # æ£€æŸ¥èŒƒå›´
     raise "Out of range: #{SolarFirstDate} to #{SolarLastDate}" if
       !(Date.new(iYear, iMonth, iDay).jd.between?(SolarFirstDate.jd, SolarLastDate.jd))
     
     lyear, lmonth, lday = iYear, 1, iDay
     
-    # ¹«ÀúÈÕÀëµ±Äê´º½ÚÏà²îµÄÌìÊı
+    # å…¬å†æ—¥ç¦»å½“å¹´æ˜¥èŠ‚ç›¸å·®çš„å¤©æ•°
     offset = iGetSNewYearOffsetDays(iYear, iMonth, iDay) - iGetLNewYearOffsetDays(iYear)
     
-    # ¹«ÀúÈÕÔÚ´º½ÚÇ°£¬Ôò´ÓÉÏÒ»ÄêÒ»ÔÂ¿ªÊ¼ËãÆğ
+    # å…¬å†æ—¥åœ¨æ˜¥èŠ‚å‰ï¼Œåˆ™ä»ä¸Šä¸€å¹´ä¸€æœˆå¼€å§‹ç®—èµ·
     if offset < 0 then
       lyear -= 1
       offset = iGetSNewYearOffsetDays(lyear, iMonth, iDay) - iGetLNewYearOffsetDays(lyear)
@@ -737,7 +737,7 @@ module CCal
     if leap != 0 then
       leap += 1
       if lmonth == leap then
-        # iMonth > 12±íÊ¾Èò(iMonth - 12)ÔÂ
+        # iMonth > 12è¡¨ç¤ºé—°(iMonth - 12)æœˆ
         lmonth += 11
       elsif lmonth > leap then
         lmonth -= 1
@@ -747,49 +747,49 @@ module CCal
     return lyear, lmonth, lday
   end
   
-  # Å©Àú×ª¹«Àú
+  # å†œå†è½¬å…¬å†
   def aLunarToSolar(iYear, iMonth, iDay)
-    # ¼ì²é·¶Î§
+    # æ£€æŸ¥èŒƒå›´
     raise "Out of range year: #{LunarFirstYear} - #{LunarLastYear}" if
       !(iYear.between?(LunarFirstYear, LunarLastYear))
     
     year, month, day = iYear, 0, 0
     
-    # iMonth > 12±íÊ¾Èò(iMonth - 12)ÔÂ
+    # iMonth > 12è¡¨ç¤ºé—°(iMonth - 12)æœˆ
     if iMonth > 12 then
       iMonth -= 11
     elsif iMonth > iGetLLeapMonth(iYear) then
       iMonth += 1
     end
     
-    # ¼ÆËã´º½Úµ½Å©ÀúÄ³ÈÕ¾­¹ıµÄÌìÊı
+    # è®¡ç®—æ˜¥èŠ‚åˆ°å†œå†æŸæ—¥ç»è¿‡çš„å¤©æ•°
     offset = iDay - 1
     1.upto(iMonth-1) { |m| offset += iGetLMonthDays(iYear, m) }
     
-    # ¼ÓÉÏ¸ÃÄê´º½ÚÀëÔªµ©µÄÌìÊı£¬¼´ÎªÄ³Å©ÀúÈÕÀëÔªµ©µÄÌìÊı
+    # åŠ ä¸Šè¯¥å¹´æ˜¥èŠ‚ç¦»å…ƒæ—¦çš„å¤©æ•°ï¼Œå³ä¸ºæŸå†œå†æ—¥ç¦»å…ƒæ—¦çš„å¤©æ•°
     offset += iGetLNewYearOffsetDays(iYear)
     
     date = Date.civil(iYear, 1, 1) + offset
     return date.year, date.month, date.day
   end
 
-  # Å©ÀúÊı¾İ¸²¸ÇµÄ¹«Àú·¶Î§
+  # å†œå†æ•°æ®è¦†ç›–çš„å…¬å†èŒƒå›´
   lyear, lmonth, lday = LunarFirstYear, 1, 1
   SolarFirstDate = Date.new(*(aLunarToSolar(lyear, lmonth, lday)))
   
   SolarLastDate = Date.new(LunarLastYear, 12, 31)
 end
 
-# Å©ÀúÈÕÆÚÀà
+# å†œå†æ—¥æœŸç±»
 class LunarDate
   include CCal
   attr_reader :lyear, :lmonth, :lday
 
-  HeavenlyStems = ["¼×", "ÒÒ", "±û", "¶¡", "Îì", "¼º", "¸ı", "ĞÁ", "ÈÉ", "¹ï"]
-  EarthlyBranches = ["×Ó", "³ó", "Òú", "Ã®", "³½", "ËÈ", "Îç", "Î´", "Éê", "ÓÏ", "Ğç", "º¥"]
-  ShengXiao = ['Êó', 'Å£', '»¢', 'ÍÃ', 'Áú', 'Éß', 'Âí', 'Ñò', 'ºï', '¼¦', '¹·', 'Öí']
-  ChineseNum = ["©–", "Ò»", "¶ş", "Èı", "ËÄ", "Îå", "Áù", "Æß", "°Ë", "¾Å", "Ê®"]
-  SolarTerms = ['Ğ¡º®', '´óº®', 'Á¢´º', 'ÓêË®', '¾ªÕİ', '´º·Ö', 'ÇåÃ÷', '¹ÈÓê', 'Á¢ÏÄ', 'Ğ¡Âú', 'Ã¢ÖÖ', 'ÏÄÖÁ', 'Ğ¡Êî', '´óÊî', 'Á¢Çï', '´¦Êî', '°×Â¶', 'Çï·Ö', 'º®Â¶', 'Ëª½µ', 'Á¢¶¬', 'Ğ¡Ñ©', '´óÑ©', '¶¬ÖÁ']
+  HeavenlyStems = ["ç”²", "ä¹™", "ä¸™", "ä¸", "æˆŠ", "å·±", "åºš", "è¾›", "å£¬", "ç™¸"]
+  EarthlyBranches = ["å­", "ä¸‘", "å¯…", "å¯", "è¾°", "å·³", "åˆ", "æœª", "ç”³", "é…‰", "æˆŒ", "äº¥"]
+  ShengXiao = ['é¼ ', 'ç‰›', 'è™', 'å…”', 'é¾™', 'è›‡', 'é©¬', 'ç¾Š', 'çŒ´', 'é¸¡', 'ç‹—', 'çŒª']
+  ChineseNum = ["ã€‡", "ä¸€", "äºŒ", "ä¸‰", "å››", "äº”", "å…­", "ä¸ƒ", "å…«", "ä¹", "å"]
+  SolarTerms = ['å°å¯’', 'å¤§å¯’', 'ç«‹æ˜¥', 'é›¨æ°´', 'æƒŠè›°', 'æ˜¥åˆ†', 'æ¸…æ˜', 'è°·é›¨', 'ç«‹å¤', 'å°æ»¡', 'èŠ’ç§', 'å¤è‡³', 'å°æš‘', 'å¤§æš‘', 'ç«‹ç§‹', 'å¤„æš‘', 'ç™½éœ²', 'ç§‹åˆ†', 'å¯’éœ²', 'éœœé™', 'ç«‹å†¬', 'å°é›ª', 'å¤§é›ª', 'å†¬è‡³']
 
   def initialize(year, month, day)
     @year, @month, @day = year, month, day
@@ -797,18 +797,18 @@ class LunarDate
     @term = iGetSolarTerm(year, month, day)
   end
   
-  # Ìì¸ÉµØÖ§
+  # å¤©å¹²åœ°æ”¯
   def ganzhi()
     temp = (@lyear - 1924).abs
     return HeavenlyStems[temp % 10] + EarthlyBranches[temp % 12]
   end
   
-  # ÉúĞ¤
+  # ç”Ÿè‚–
   def shengxiao()
     return ShengXiao[(@lyear - 1924).abs % 12]
   end
   
-  # ÖĞÎÄÄê·İ
+  # ä¸­æ–‡å¹´ä»½
   def cyear()
     s = ChineseNum[@year / 1000]
     s += ChineseNum[@year % 1000 / 100]
@@ -817,46 +817,46 @@ class LunarDate
     return s
   end
   
-  # ÖĞÎÄÔÂ·İ
+  # ä¸­æ–‡æœˆä»½
   def cmonth()
     s = ''
     m = @lmonth
     if m > 12 then
       m -= 12
-      s += 'Èò'
+      s += 'é—°'
     end
     case m
     when 12
-      s += 'À°ÔÂ'
+      s += 'è…Šæœˆ'
     when 11
-      s += '¶¬ÔÂ'
+      s += 'å†¬æœˆ'
     when 1
-      s += 'ÕıÔÂ'
+      s += 'æ­£æœˆ'
     else
-      s += ChineseNum[m] + 'ÔÂ'
+      s += ChineseNum[m] + 'æœˆ'
     end
     return s
   end
   
-  # ÖĞÎÄÈÕ·İ
+  # ä¸­æ–‡æ—¥ä»½
   def cday()
     s = ''
     if @lday > 29 then
-      s += 'ÈıÊ®'
+      s += 'ä¸‰å'
     elsif @lday > 20 then
-      s += 'Ø¥' + ChineseNum[@lday % 20]
+      s += 'å»¿' + ChineseNum[@lday % 20]
     elsif @lday == 20 then
-      s += '¶şÊ®'
+      s += 'äºŒå'
     elsif @lday > 10
-      s += 'Ê®' + ChineseNum[@lday % 10]
+      s += 'å' + ChineseNum[@lday % 10]
     else
-      s += '³õ' + ChineseNum[@lday]
+      s += 'åˆ' + ChineseNum[@lday]
     end
     
     return s
   end
   
-  # ½ÚÆøÃû
+  # èŠ‚æ°”å
   def cterm()
     puts @term
     return SolarTerms[@term-1]
@@ -864,8 +864,8 @@ class LunarDate
   
   def to_s(fmt = '')
     if fmt == '' then
-      fmt += "¹«Ôª#{cyear}Äê "
-      fmt += "Å©Àú#{ganzhi}(#{shengxiao})Äê#{cmonth}#{cday}"
+      fmt += "å…¬å…ƒ#{cyear}å¹´ "
+      fmt += "å†œå†#{ganzhi}(#{shengxiao})å¹´#{cmonth}#{cday}"
       fmt += "(#{cterm})" if @term > 0
     end
     return fmt
