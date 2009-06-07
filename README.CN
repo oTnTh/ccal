@@ -1,0 +1,22 @@
+= Description
+
+rbCCal是一个实现公历和农历互转的Ruby库，采用查表法进行换算。农历数据
+出自Zhuo Meng的CCal，参见：
+
+ http://ccal.chinesebay.com/ccal/ccal.htm.cn
+
+本程序采用GPL许可证发布，详细内容请查阅COPYING文件。
+
+= Synopsis
+
+ require 'ccal'
+ 
+ l = Time.now.to_lunar()
+ puts l.lyear, l.lmonth, l.lday
+ puts Time.from_lunar(l.lyear, l.lmonth, l.lday)
+ 
+ l = Date.new(2009, 6, 4).to_lunar()
+ puts l.to_s()
+ puts Date.from_lunar(l.lyear, l.lmonth, l.lday)
+
+= Motivation
