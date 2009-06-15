@@ -873,7 +873,6 @@ class LunarDate
 end
 
 class Time
-  include CCal
   def to_lunar()
     return LunarDate.new(self.year, self.month, self.day)
   end
@@ -884,7 +883,6 @@ class Time
 end
 
 class Date
-  include CCal
   def to_lunar()
     return LunarDate.new(self.year, self.month, self.day)
   end
