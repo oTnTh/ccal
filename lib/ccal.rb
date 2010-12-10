@@ -756,9 +756,10 @@ module CCal
     year, month, day = iYear, 0, 0
     
     # iMonth > 12表示闰(iMonth - 12)月
+    leap = iGetLLeapMonth(iYear)
     if iMonth > 12 then
       iMonth -= 11
-    elsif iMonth > iGetLLeapMonth(iYear) then
+    elsif leap != 0 and iMonth > iGetLLeapMonth(iYear) then
       iMonth += 1
     end
     
