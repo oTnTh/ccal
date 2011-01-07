@@ -1,0 +1,6 @@
+== CCal
+
+=== 2009-6-7 - v1.0
+
+由Zhuo Meng的CCal（参见：http://ccal.chinesebay.com/ccal/ccal.htm.cn）移植而来。
+计算部分采用查表法，可处理公元1900年至公元2100年的公历和农历转换。
