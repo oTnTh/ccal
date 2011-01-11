@@ -2,8 +2,8 @@
 # 检验移植自“寿星天文历”的代码是否工作正常，需要预先准备“寿星天文历”输出的JSON文件
 
 FILE_DIR = File.dirname(File.expand_path(__FILE__))
-require File.join(FILE_DIR, '../lib/ccal.rb')
-require 'date'
+$:.push File.join(FILE_DIR, '../lib')
+require 'ccal'
 require 'json'
 
 ary = JSON.parse(File.open(File.join(FILE_DIR, 'json.txt'), 'r:utf-8').read)
