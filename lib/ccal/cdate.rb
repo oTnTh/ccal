@@ -169,7 +169,7 @@ module CCal
         # 有环境变量则采用
         if ENV['LANG'] || ENV['LC_ALL'] then
           @loc = locale_env
-        elsif RUBY_PLATFORM =~ /mingw|mswin/ then
+        elsif RUBY_PLATFORM =~ /cygwin|mingw|mswin/ then
           # 无环境变量并在Windows内则使用API
           @loc = locale_win32api
         end
@@ -195,7 +195,7 @@ module CCal
     # * :zq => {} # 中气表
     # * :hs => [] # 合朔表
     # * :dx => [] # 各月大小
-    def year(jd)
+    def calc_year(jd)
       year = jd2date(jd)[0] # jd2date比Date类算起来快
       return @cache[year] if @cache.has_key?(year)
 
@@ -229,8 +229,8 @@ module CCal
     # * :term => int # 当日所含节气，无节气为-1
     # * :astrology => int # 星座
     #
-    def day(jd)
-      dat = year(jd)
+    def calc_day(jd)
+      dat = calc_year(jd)
       jd -= GolEph::J2000 # 底层代码以2k年起算
       d = {}
 
@@ -242,8 +242,8 @@ module CCal
       i += 9000
       # .Net的ChineseLunisolarCalendar类里边
       # 天干翻做Celestial Stem，地支翻作Terrestrial Branch
-      d[:stem] = i%10; d[:branch] = i%12
-      d[:animal] = i%12
+      d[:stem] = @stems[i%10]
+      i = i%12; d[:branch] = @branches[i]; d[:animal] = @animals[i]
 
       # 干支纪月
       ## 1998年12月7(大雪)开始连续进行节气计数,0为甲子
@@ -252,34 +252,60 @@ module CCal
       i += 1 if i<12 && jd>=dat[:zq][2*i+1]
       ## 相对于1998年12月7(大雪)的月数,900000为正数基数
       i = i + ((dat[:zq][12]+390)/365.2422).floor * 12 + 900000;
-      d[:stem_m] = i%10; d[:branch_m] = i%12
+      d[:stem_m] = @stems[i%10]; d[:branch_m] = @branches[i%12]
 
       # 干支纪日
       ## 2000年1月7日起算
       i = jd - 6 + 9000000
-      d[:stem_d] = i%10; d[:branch_d] = i%12
+      d[:stem_d] = @stems[i%10]; d[:branch_d] = @branches[i%12]
 
       # 月
       i = ((jd - dat[:hs][0])/30).floor
       i += 1 if i<13 && dat[:hs][i+1]<=jd
       d[:cmleap] = dat[:leap] == i ? true : false # 是否闰月
       d[:cmdays] = dat[:dx][i] # 该月多少天，判断大小月
-      d[:cmonth] = dat[:ym][i]
+      d[:cmonth] = @months[dat[:ym][i]]
 
       # 日
-      d[:cday] = jd - dat[:hs][i]
+      d[:cday] = @days[jd - dat[:hs][i]]
 
       # 节气
       i = ((jd - dat[:zq][0] - 7)/15.2184).floor
       i += 1 if i < 23 && jd >= dat[:zq][i+1]
-      d[:term] = jd == dat[:zq][i] ? i : -1
+      d[:term] = jd == dat[:zq][i] ? @terms[i] : ''
 
       # 星座
       # 好吧，农历也弄这个蛮无聊的其实
       i = ((jd - dat[:zq][0] - 15)/30.43685).floor
       i += 1 if i<11 && jd>=dat[:zq][2*i+2]
-      d[:astrology] = i%12
+      d[:astrology] = @astrologies[i%12]
 
+      return d
+    end
+
+    def from_ccal(cyear, cmonth, cday, leap = false)
+      # 后端中正月是2，11月和12月分别是0和1
+      cmonth += cmonth > 10 ? -11 : 1
+      jd = date2jd(cyear, 1, 1)
+      dat = calc_year(jd)
+      m = dat[:ym].index(2) # 正月的位置
+      n = dat[:ym].index(cmonth) # 目标月的位置
+      if n < m then
+        # 目标月在正月之前，说明该月属于下一年
+        jd += 366
+        dat = calc_year(jd)
+        n = dat[:ym].index(cmonth)
+      end
+
+      if leap then
+        # 要找的是一个闰月
+        raise "#{cyear} deosn't have a leap month" if dat[:leap] == 0
+        raise "wrong leap month number" if dat[:ym][dat[:leap]] != cmonth
+        n += 1
+      end
+
+      d = jd2date(dat[:hs][n] + cday - 1 + CCal::GolEph::J2000)
+      d[2] -= 0.5
       return d
     end
 
@@ -289,6 +315,9 @@ module CCal
     # 计算八字
     #
     # 参数为DateTime类型
+    #
+    # 算八字需要准确的经度，否则时间的部分误差会非常大，这个函数似乎还是删掉的好。
+    #
     def bazi(dt)
       zone = (dt.offset*24).to_i
       jd = dt.jd - 0.5 # ruby总是返回整数，减0.5得午夜0时的儒略日数
