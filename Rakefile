@@ -2,7 +2,7 @@
 
 FILE_DIR = File.dirname(File.expand_path(__FILE__))
 $:.push File.join(FILE_DIR, 'lib')
-require 'ccal'
+require 'ccal/version'
 require 'rubygems'
 require 'rake'
 require 'rake/clean'
