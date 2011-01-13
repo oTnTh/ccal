@@ -219,15 +219,15 @@ module CCal
     #
     # 返回一个包括实参对应日期所在日农历数据的Hash：
     #
-    # * :stem => int # 当年天干
-    # * :branch => int # 当年地支
-    # * :animal => int # 当年生肖
-    # * :cmonth => int # 月名
+    # * :stem => string # 当年天干
+    # * :branch => string # 当年地支
+    # * :animal => string # 当年生肖
+    # * :cmonth => string # 月名
     # * :cmleap => bool # 当月是否为闰月
     # * :cmdays => int # 当月天数，用以判断月大小
-    # * :cday => int # 日名
-    # * :term => int # 当日所含节气，无节气为-1
-    # * :astrology => int # 星座
+    # * :cday => string # 日名
+    # * :term => string # 当日所含节气，无节气为nil
+    # * :astrology => string # 星座
     #
     def calc_day(jd)
       dat = calc_year(jd)
